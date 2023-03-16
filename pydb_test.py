@@ -57,8 +57,7 @@ def tmpDb():
 
 @pytest.fixture
 def db_with_table(tmpDb):
-    createObj = Entity()
-    tmpDb.create(createObj)
+    tmpDb.create(Entity())
     yield tmpDb
 
 @pytest.fixture
@@ -70,20 +69,15 @@ def db_with_data(db_with_table):
     db_with_table.insert(insertObj)
     yield db_with_table
 
-def test_pydb_create(caplog, tmpDb):
-    # Arrange
-    caplog.set_level(logging.DEBUG)
-    createObj = Entity()
-
+def test_pydb_create(tmpDb):
     # Act
-    tmpDb.create(createObj)
+    tmpDb.create(Entity())
 
     # Assert
     assert tmpDb.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='test_table';").fetchone()[0] == 'test_table'
 
-def test_pydb_insert(caplog, db_with_table):
+def test_pydb_insert(db_with_table):
     # Arrange
-    caplog.set_level(logging.DEBUG)
     insertObj = Entity()
     insertObj.id = 1
     insertObj.name = 'test'
@@ -98,10 +92,7 @@ def test_pydb_insert(caplog, db_with_table):
     assert row[1] == 'test'
     assert row[2] == 42
 
-def test_pydb_select(caplog, db_with_data):
-    # Arrange
-    caplog.set_level(logging.DEBUG)
-
+def test_pydb_select(db_with_data):
     # Act
     res = db_with_data.select(Entity())
 
